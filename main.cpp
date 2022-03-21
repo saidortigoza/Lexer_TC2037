@@ -18,8 +18,14 @@ vector<string> extraerArchivo (string archivo) {
   return aux;
 }
 void printIdentificador (string str) {
-  regex reg("[^0-9][a-zA-Z_]+[a-zA-Z_0-9]*");
-  sregex_iterator currentMatch(str.begin(), str.end(), reg);
+  regex reg("[a-zA-Z_]+[a-zA-Z_0-9]*");
+  regex reg1("[0-9]+[a-zA-Z]+[0-9]*");
+  regex reg2("[/][/][ a-zA-Z0-9_]*");
+  string filterNumStr;
+  regex_replace(back_inserter(filterNumStr), str.begin(), str.end(), reg1, "");
+  string filterComStr;
+  regex_replace(back_inserter(filterComStr), filterNumStr.begin(), filterNumStr.end(), reg2,"");
+  sregex_iterator currentMatch(filterComStr.begin(), filterComStr.end(), reg);
   sregex_iterator lastMatch;
   while (currentMatch != lastMatch) {
     smatch match = *currentMatch;
@@ -30,8 +36,14 @@ void printIdentificador (string str) {
 }
 
 void printInt (string str) {
-  regex reg("\\d+(?!.)");
-  sregex_iterator currentMatch(str.begin(), str.end(), reg);
+  regex reg("[0-9]+");
+  regex reg1("[0-9]+[.][0-9]+");
+  regex reg2("[a-zA-Z]+[+-]*[0-9]+");
+  string filterDecimal;
+  regex_replace(back_inserter(filterDecimal), str.begin(), str.end(), reg1, "");
+  string filterExp;
+  regex_replace(back_inserter(filterExp), filterDecimal.begin(), filterDecimal.end(), reg2, "");
+  sregex_iterator currentMatch(filterExp.begin(), filterExp.end(), reg);
   sregex_iterator lastMatch;
   while (currentMatch != lastMatch) {
     smatch match = *currentMatch;
@@ -42,7 +54,7 @@ void printInt (string str) {
 }
 
 void printReal (string str) {
-  regex reg("[+-]*[0-9]+[.][0-9]+([eE][+-][0-9]+)?");
+  regex reg("[+-]*[0-9]+[.][0-9]+([eE][+-]*[0-9]+)?");
   sregex_iterator currentMatch(str.begin(), str.end(), reg);
   sregex_iterator lastMatch;
   while (currentMatch != lastMatch) {
@@ -102,8 +114,11 @@ void printComment(string str) {
 }
 
 void printDiv(string str) {
-  regex reg("(?!\\/\\/)[/]");
-  sregex_iterator currentMatch(str.begin(), str.end(), reg);
+  regex reg("[/]");
+  regex reg1("[/][/][ a-zA-Z0-9_]*");
+  string filterCom;
+  regex_replace(back_inserter(filterCom), str.begin(), str.end(), reg1, "");
+  sregex_iterator currentMatch(filterCom.begin(), filterCom.end(), reg);
   sregex_iterator lastMatch;
   while (currentMatch != lastMatch) {
     smatch match = *currentMatch;
@@ -114,7 +129,7 @@ void printDiv(string str) {
 }
 
 void printMinus(string str) {
-  regex reg("[-]");
+  regex reg("[-] (?!\\d+\\w+\\W+)");
   sregex_iterator currentMatch(str.begin(), str.end(), reg);
   sregex_iterator lastMatch;
   while (currentMatch != lastMatch) {
